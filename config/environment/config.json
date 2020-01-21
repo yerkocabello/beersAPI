@@ -1,0 +1,30 @@
+{
+  "development": {
+    "username": "root",
+    "password": "root",
+    "database": "beersDB",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "operatorsAliases": false,
+    "pagination":{
+      "general": 50,
+      "small": 20
+    }
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "beersDB",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "operatorsAliases": false
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "beersDB",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "operatorsAliases": false
+  }
+}
