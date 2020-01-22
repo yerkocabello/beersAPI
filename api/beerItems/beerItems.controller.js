@@ -2,6 +2,8 @@
 
 import {BeerItem} from '../../models';
 import {pagination}  from '../../utils/pagination';
+import _ from 'lodash';
+var currencyLayer = require('../../integrations/currencyLayer');
 
 
 function respondWithResult(res, statusCode) {
@@ -31,7 +33,7 @@ function handleEntityNotFound(res) {
     };
 }
 
-
+// Gets a list of BeerItems from the DB
 export function index(req, res) {
     return BeerItem.count({
     }).then(function (count) {
@@ -58,7 +60,7 @@ export function index(req, res) {
     });
 }
 
-// Gets a single Brand from the DB
+// Gets a single BeerItem from the DB
 export function show(req, res) {
     return BeerItem.findOne({
         where: {
@@ -68,4 +70,31 @@ export function show(req, res) {
         .then(handleEntityNotFound(res))
         .then(respondWithResult(res))
         .catch(handleError(res));
+}
+
+// Creates a new BeerItem in the DB
+export function create(req, res) {
+    var beerItem = _.pick(req.body, 'name', 'brewery', 'country', 'price', 'currency');
+    return BeerItem.create(beerItem)
+        .then(respondWithResult(res, 201))
+        .catch(handleError(res));
+}
+
+// Gets the converted price for the beer currency
+export function getConvertedPriceForBox(req, res) {
+    const QTY_PER_BOX = 6;
+    return BeerItem.findOne({
+       where: {
+           id: req.params.id
+       }
+    }).then(function (beerItem) {
+        currencyLayer.getCurrecyPrices(beerItem.currency).then(function (result) {
+            var totalPrice = 0;
+            _.forEach(result.quotes, function (quote) {
+                totalPrice = (quote * QTY_PER_BOX * beerItem.price);
+            });
+            return { 'total' : totalPrice };
+        }).then(respondWithResult(res))
+            .catch(handleError(res));
+    });
 }

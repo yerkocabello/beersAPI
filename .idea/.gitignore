@@ -1,2 +1,7 @@
 # Default ignored files
 /workspace.xml
+/beersAPI.iml
+/misc.xml
+/modules.xml
+/vcs.xml
+/node_modules/

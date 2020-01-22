@@ -3,7 +3,6 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('BeerItems', {
       id: {
-        allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
@@ -21,7 +20,7 @@ module.exports = {
       },
       price: {
         allowNull: false,
-        type: Sequelize.INTEGER,
+        type: Sequelize.DOUBLE,
       },
       currency: {
         allowNull: false,

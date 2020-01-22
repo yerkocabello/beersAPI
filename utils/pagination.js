@@ -3,7 +3,7 @@
 var DEFAULT_OFFSET = 0;
 const env = process.env.NODE_ENV || 'development';
 
-const config = require(__dirname + '/../config/environment/config.json')[env];
+const config = require(__dirname + '/../config/config.json')[env];
 
 var DEFAULT_PAGE_SIZE = parseInt(config.pagination.general);
 

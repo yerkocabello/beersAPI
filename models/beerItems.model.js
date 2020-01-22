@@ -3,7 +3,6 @@ module.exports = (sequelize, DataTypes) => {
     const BeerItem = sequelize.define('BeerItem', {
         id: {
             type: DataTypes.INTEGER,
-            allowNull: false,
             primaryKey: true
         },
         name: {
@@ -20,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         price: {
             allowNull: false,
-            type: DataTypes.INTEGER,
+            type: DataTypes.DOUBLE,
         },
         currency: {
             allowNull: false,

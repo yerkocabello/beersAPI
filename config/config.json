@@ -9,6 +9,10 @@
     "pagination":{
       "general": 50,
       "small": 20
+    },
+    "currencyLayer": {
+      "url": "http://api.currencylayer.com",
+      "apiKey": "71d0106e1ab83180fd0264d05cc1be91"
     }
   },
   "test": {
