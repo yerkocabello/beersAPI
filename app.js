@@ -6,8 +6,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('./api/beerItems/index');
-var beersRouter = require('./api/beerItems');
+var indexRouter = require('./src/api/beerItems/index');
+var beersRouter = require('./src/api/beerItems');
 
 var app = express();
 

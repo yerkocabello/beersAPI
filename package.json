@@ -2,7 +2,9 @@
   "name": "beersapp",
   "version": "1.0.0",
   "private": true,
-  "scripts": {},
+  "scripts": {
+    "test": "mocha 'test/**/*.js' --require babel-polyfill --compilers js:babel-register"
+  },
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
@@ -12,9 +14,12 @@
     "lodash-express": "^0.1.0",
     "morgan": "~1.9.1",
     "mysql2": "^2.1.0",
+    "proxyquire": "^2.1.3",
     "request": "^2.88.0",
     "request-promise": "^4.2.5",
-    "sequelize": "^5.21.3"
+    "sequelize": "^5.21.3",
+    "sinon": "^8.1.1",
+    "sinon-chai": "^3.4.0"
   },
   "type": "module",
   "devDependencies": {
@@ -22,6 +27,9 @@
     "@babel/core": "^7.8.3",
     "@babel/preset-env": "^7.8.3",
     "@babel/register": "^7.8.3",
-    "sequelize-cli": "^5.5.1"
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "sequelize-cli": "^5.5.1",
+    "supertest": "^4.0.2"
   }
 }

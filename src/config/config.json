@@ -11,7 +11,8 @@
       "small": 20
     },
     "currencyLayer": {
-      "url": "http://api.currencylayer.com",
+      "baseUrl": "http://api.currencylayer.com",
+      "endpoints": ["/live", "/historical", "/convert", "/timeframe", "/change", "/list"],
       "apiKey": "71d0106e1ab83180fd0264d05cc1be91"
     }
   },

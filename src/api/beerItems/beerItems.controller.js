@@ -33,6 +33,15 @@ function handleEntityNotFound(res) {
     };
 }
 
+function validateCurrency(currency){
+    return currencyLayer.getCurrencyList().then(function (results) {
+        var currencyIndex = _.findIndex(Object.keys(results.currencies), function (res) {
+           return res === currency;
+       });
+       return currencyIndex > -1;
+    });
+}
+
 // Gets a list of BeerItems from the DB
 export function index(req, res) {
     return BeerItem.count({
@@ -75,13 +84,24 @@ export function show(req, res) {
 // Creates a new BeerItem in the DB
 export function create(req, res) {
     var beerItem = _.pick(req.body, 'name', 'brewery', 'country', 'price', 'currency');
-    return BeerItem.create(beerItem)
-        .then(respondWithResult(res, 201))
+    validateCurrency(beerItem.currency).then(function (validation) {
+        if(validation){
+            return BeerItem.create(beerItem)
+                .then(respondWithResult(res, 201))
+                .catch(handleError(res));
+        }else{
+            res.status(404)
+                .send('Not found');
+            return Promise.reject('Currency not found');
+        }
+
+    }).then(handleEntityNotFound(res))
         .catch(handleError(res));
+
 }
 
 // Gets the converted price for the beer currency
-export function getConvertedPriceForBox(req, res) {
+export function getBoxPrice(req, res) {
     const QTY_PER_BOX = 6;
     return BeerItem.findOne({
        where: {

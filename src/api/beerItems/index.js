@@ -3,9 +3,17 @@ var router = express.Router();
 var controller = require('./beerItems.controller');
 
 /* Endpoints for beerItems. */
+
+/* Lists all the beers found in the system */
 router.get('/beers', controller.index);
+
+/* Lists the details of a specific beer. */
 router.get('/beers/:id', controller.show);
+
+/* Creates a new beer. */
 router.post('/beers', controller.create);
-router.get('/beers/:id/boxprice', controller.getConvertedPriceForBox);
+
+/* Gets the value of a specific beer box */
+router.get('/beers/:id/boxprice', controller.getBoxPrice);
 
 module.exports = router;
