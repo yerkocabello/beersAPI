@@ -6,146 +6,129 @@ import _ from 'lodash';
 var currencyLayer = require('../../integrations/currencyLayer');
 
 
-function respondWithResult(res, statusCode) {
+function respondWithResult(res, statusCode, entity) {
     statusCode = statusCode || 200;
-    return function (entity) {
-        if(entity){
-            res.status(statusCode).json(entity);
-        }
-    };
+    if(!_.isNil(entity)){
+        res.status(statusCode).json(entity);
+    }else{
+        res.status(404).end();
+    }
 }
 
-function handleError(res, statusCode) {
+function handleError(res, statusCode, err) {
     statusCode = statusCode || 500;
-    return function(err) {
-        console.log(err);
-        res.status(statusCode).send(err);
-    };
+    res.status(statusCode).send(err);
 }
 
-function handleEntityNotFound(res) {
-    return function(entity) {
-        if (!entity) {
-            res.status(404).end();
-            return null;
-        }
-        return entity;
-    };
-}
-
-function validateCurrency(currency){
+async function validateCurrency(currency){
     if(_.isNil(currency)) return Promise.resolve(true);
-    return currencyLayer.getCurrencyList()
-        .then(function (results) {
-        var currencyIndex = _.findIndex(Object.keys(results.currencies), function (res) {
-           return res === currency;
-       });
-       return Promise.resolve(currencyIndex > -1);
+    var results = await currencyLayer.getCurrencyList();
+    var currencyIndex = _.findIndex(Object.keys(results.currencies), function (res) {
+        return res === currency;
     });
+    return Promise.resolve(currencyIndex > -1);
 }
 
 // Gets a list of BeerItems from the DB
-export function index(req, res) {
-    return BeerItem.count({
-    }).then(function (count) {
+export async function index(req, res) {
+    var resultWrapper = {};
+    try{
+        var count = await BeerItem.count({});
         var _pagination = {
             limit: count
         };
         if(req.params.page){
             _pagination = pagination.paginate(req.params.page, count);
         }
-        return BeerItem.findAll({
+        var results = await BeerItem.findAll({
             order:[
                 ['name']
             ],
             offset: _pagination.offset,
             limit: _pagination.limit
-        }).then(function (result) {
-            var resultWrapper = {};
-            resultWrapper.entries = result;
-            resultWrapper.pagination = _pagination;
-            return resultWrapper
-        })
-            .then(respondWithResult(res))
-    .catch(handleError(res));
-    });
+        });
+        resultWrapper.entries = results;
+        resultWrapper.pagination = _pagination;
+        if(resultWrapper.entries.length > 0){
+            return respondWithResult(res, 200, resultWrapper);
+        }else {
+            return respondWithResult(res, 204, resultWrapper);
+        }
+
+    }catch (e) {
+        return handleError(res, 500, e);
+    }
 }
 
 // Gets a single BeerItem from the DB
-export function show(req, res) {
-    return BeerItem.findByPk(req.params.id)
-        .then(handleEntityNotFound(res))
-        .then(respondWithResult(res))
-        .catch(handleError(res));
+export async function show(req, res) {
+    var result = {};
+    try{
+        result = await BeerItem.findByPk(req.params.id);
+        respondWithResult(res, 200, result);
+    }catch(e){
+        return handleError(res, 500, e);
+    }
 }
 
 // Creates a new BeerItem in the DB
-export function create(req, res) {
+export async function create(req, res) {
     var beerItem = _.pick(req.body, 'name', 'brewery', 'country', 'price', 'currency');
-    return validateCurrency(beerItem.currency)
-        .then(function (validation) {
-        if(validation){
-            return BeerItem.create(beerItem)
-                .then(respondWithResult(res, 201))
-                .catch(handleError(res));
-        }else{
-            res.status(404)
-                .send('Not found');
-            return Promise.reject('Currency not found');
+    var validation = await validateCurrency(beerItem.currency);
+    var createdBeerItem;
+    if(validation){
+        try{
+            createdBeerItem = await BeerItem.create(beerItem);
+        }catch (e) {
+            return handleError(res, 500, e);
         }
-
-    }).then(handleEntityNotFound(res))
-        .catch(handleError(res));
-
+    }
+    return respondWithResult(res, 201, createdBeerItem);
 }
 
 // Gets the converted price for the beer currency
-export function getBoxPrice(req, res) {
+export async function getBoxPrice(req, res) {
     const QTY_PER_BOX = 6;
-    return BeerItem.findByPk(req.params.id)
-        .then(function (beerItem) {
-        return currencyLayer.getCurrecyPrices(beerItem.currency)
-            .then(function (result) {
-            var totalPrice = 0;
-            _.forEach(result.quotes, function (quote) {
-                totalPrice = (quote * QTY_PER_BOX * beerItem.price);
-            });
-            return { 'total' : totalPrice };
-        }).then(respondWithResult(res))
-            .catch(handleError(res));
-    });
+    try{
+        var beerItem = await BeerItem.findByPk(req.params.id);
+        var result = await currencyLayer.getCurrecyPrices(beerItem.currency);
+        var totalPrice = 0;
+        _.forEach(result.quotes, function (quote) {
+            totalPrice = (quote * QTY_PER_BOX * beerItem.price);
+        });
+        var result = { 'total' : totalPrice };
+        return respondWithResult(res, 200, result);
+    }catch(e){
+       return handleError(res, 500, e);
+    }
 }
 
 //Updates a beerItem in the DB
-export function update(req, res) {
+export async function update(req, res) {
     var currency = req.body.currency ? req.body.currency : null;
-    return validateCurrency(currency)
-        .then(function (validation) {
+    try {
+        var validation = await validateCurrency(currency);
+        var updatedItem;
         if(validation){
-            return BeerItem.findOne({ where: { id: req.params.id } })
-                .then(function (itemToUpdate) {
-                    var _updates = _.pick(req.body, 'name', 'brewery', 'country', 'price', 'currency');
-                    return itemToUpdate.update(_updates)
-                    .then(function (updatedItem) {
-                        return updatedItem;
-                }, function (err) {
-                        console.log(err);
-                    })
-            });
-        }else{
-            res.status(404)
-                .send('Not found');
-            Promise.reject('Currency not found')
+            var itemToUpdate = await BeerItem.findOne({ where: { id: req.params.id } });
+            var _updates = _.pick(req.body, 'name', 'brewery', 'country', 'price', 'currency');
+            updatedItem = await itemToUpdate.update(_updates);
         }
-    })
-        .then(respondWithResult(res))
-        .catch(handleError(res));
+        return respondWithResult(res, 200, updatedItem);
+    }catch(e){
+        return handleError(res, 500, e);
+    }
 }
 
 /* Removes a record from the DB */
-export function destroy(req, res) {
-    return BeerItem.destroy({
-        where: {id: req.params.id}
-    }).then(respondWithResult(res))
-        .catch(handleError(res));
+export async function destroy(req, res) {
+    var result = {};
+    try{
+        result = await BeerItem.destroy({
+            where: {id: req.params.id}
+        });
+        return respondWithResult(res, 200, result);
+    }catch(e){
+        return handleError(res, 500, e);
+    }
 } 
