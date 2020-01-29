@@ -10,12 +10,16 @@ var answerProviderCtrlStub = {
     index: 'beerItemCtrl.index',
     show: 'beerItemCtrl.show',
     create: 'beerItemCtrl.create',
+    put: 'beerItemCtrl.update',
+    delete: 'beerItemCtrl.destroy',
     getBoxPrice: 'beerItemCtrl.getBoxPrice'
 };
 
 var routerStub = {
     get: sinon.spy(),
-    post: sinon.spy()
+    post: sinon.spy(),
+    put: sinon.spy(),
+    delete: sinon.spy()
 };
 
 // require the index with our stubbed out modules
@@ -68,49 +72,23 @@ describe('BeerItem API Router:', function () {
             ).to.have.been.called;
         });
     });
-});
+/*
+    describe('PUT /beers/:id', function() {
 
-/*var request = require('supertest');
-const chai = require("chai");
-const chaiHttp = require('chai-http');
-const app = require('../../../start');
-chai.use(chaiHttp);
-chai.should();
-
-describe('/beers', function () {
-    it('should get a status 200', function() {
-        chai.request(app)
-            .get('/beers')
-            .end(function(err, res){
-                res.should.have.status(200);
-                res.body.should.be.a('object');
-                if (err) throw err;
-            });
+        it('should route to beerItem.controller.update', function() {
+            expect(routerStub.put
+                .withArgs('/beers/:id', 'beerItemCtrl.update')
+            ).to.have.been.called;
+        });
     });
+
+    describe('DELETE /beers/:id', function() {
+
+        it('should route to beerItem.controller.destroy', function() {
+            expect(routerStub.delete
+                .withArgs('/beers/:id', 'beerItemCtrl.destroy')
+            ).to.have.been.called;
+        });
+    });*/
 });
-
-describe('/beers/:id', function () {
-    it('should get a status 200', function() {
-        chai.request(app)
-            .get('/beers/1')
-            .end(function(err, res){
-                res.should.have.status(200);
-                res.body.should.be.a('object');
-                if (err) throw err;
-            });
-    });
-});
-
-describe('/beers/:id', function () {
-    it('should get a status 200', function() {
-        chai.request(app)
-            .get('/beers/1')
-            .end(function(err, res){
-                res.should.have.status(200);
-                res.body.should.be.a('object');
-                if (err) throw err;
-            });
-    });
-});*/
-
 

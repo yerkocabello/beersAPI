@@ -13,7 +13,14 @@ router.get('/beers/:id', controller.show);
 /* Creates a new beer. */
 router.post('/beers', controller.create);
 
+/* Updates an existing beer. */
+router.put('/beers/:id', controller.update);
+
+/* Deletes a beerItem from the DB*/
+router.delete('/beers/:id', controller.destroy);
+
 /* Gets the value of a specific beer box */
 router.get('/beers/:id/boxprice', controller.getBoxPrice);
+
 
 module.exports = router;

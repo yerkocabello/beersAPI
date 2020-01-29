@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "mocha 'test/**/*.js' --require babel-polyfill --compilers js:babel-register"
+    "test": "nyc --reporter=html --reporter=text mocha 'test/**/*.js'"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -19,7 +19,8 @@
     "request-promise": "^4.2.5",
     "sequelize": "^5.21.3",
     "sinon": "^8.1.1",
-    "sinon-chai": "^3.4.0"
+    "sinon-chai": "^3.4.0",
+    "sinon-test": "^2.4.1"
   },
   "type": "module",
   "devDependencies": {
@@ -29,6 +30,7 @@
     "@babel/register": "^7.8.3",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "nyc": "^15.0.0",
     "sequelize-cli": "^5.5.1",
     "supertest": "^4.0.2"
   }
