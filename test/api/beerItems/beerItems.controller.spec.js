@@ -90,7 +90,6 @@ describe('get', function () {
             status: sinon.stub().returns({ json: sinon.stub().returns({}), end: sinon.stub().returns({}), send: sinon.stub().returns({}) })
         };
         req = { params: {id: 2}};
-        expectedResult = [{}, {}, {}]
     });
     it('should return a list with beerItems', test(function () {
         controller.index(req, res).then(function (result) {
